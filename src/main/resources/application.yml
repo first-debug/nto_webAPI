@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: nto_webAPI
+  datasource:
+    driver-class-name: org.sqlite.JDBC
+    url: 'jdbc:sqlite:D:\Projects\java\nto\src\main\resources\com\vladislav\infrastructure\db.db'

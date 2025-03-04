@@ -1,0 +1,80 @@
+document.addEventListener("DOMContentLoaded", async () => {
+    let seats;
+    let selectedSeats = Array();
+    const params = new URLSearchParams(window.location.search);
+    const eventId = params.get("eventId");
+
+
+    if (eventId) {
+        const eventRes = await fetch(`http://localhost:8080/api/events/${eventId}`);
+        const event = await eventRes.json();
+        document.getElementById("event-title").innerText = event.title;
+        document.getElementById("event-date").innerText = event.startTime;
+
+        const seatsRes = await fetch(`http://localhost:8080/api/events/${event.id}/seats`);
+        const seatsJson = await seatsRes.json();
+        seats = seatsJson.seats;
+
+        const seatsGrid = document.querySelector('.seats-grid');
+
+        const rows = seats.length;
+        const cols = seats[0].length;
+
+        seatsGrid.style.gridTemplateColumns = `repeat(${cols}, 30px)`;
+
+        for (let i = 0; i < rows; i++) {
+            for (let j = 0; j < cols; j++) {
+                const seat = document.createElement('div');
+                seat.dataset.row = i;
+                seat.dataset.col = j;
+                seat.className = 'seat';
+                if (seats[i][j] === 1) {
+                    seat.onclick = async () => {
+                        if (seats[seat.dataset.row][seat.dataset.col] === 1) {
+                            seats[seat.dataset.row][seat.dataset.col] = 2;
+                            seat.className = seat.className.replace("exist", "selected");
+                            selectedSeats.push(Array(seat.dataset.row, seat.dataset.col));
+                        } else {
+                            seats[seat.dataset.row][seat.dataset.col] = 1;
+                            seat.className = seat.className.replace("selected", "exist");
+                            selectedSeats = selectedSeats.filter((i) =>
+                                i[0] !== seat.dataset.row || i[1] !== seat.dataset.col);
+                        }
+                    }
+                    seat.className += " exist";
+                } else if (seats[i][j] === 2)
+                    seat.className += " occupied";
+                seatsGrid.appendChild(seat);
+            }
+        }
+
+        const footer = document.getElementById("footer");
+        const button = document.createElement("button");
+        button.textContent = "Забронировать";
+        button.className = "book-button";
+        button.addEventListener("click", async () => {
+            try {
+                const res = await fetch(`http://localhost:8080/api/events/book`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ eventId, seats: selectedSeats })
+                });
+                const data = await res.json();
+                if (data.orderId === typeof undefined) {
+                    alert(data.message);
+                    window.location.reload()
+                } else {
+                    window.location.href = `/order?orderId=${data.orderId}`;
+                }
+            } catch (error) {
+                console.error("Ошибка бронирования:", error);
+                alert("Ошибка при бронировании");
+            }
+        });
+        footer.appendChild(button);
+    } else {
+        document.getElementById("event-title").innerText = `Event with ID: ${eventId} not found`;
+        console.error(`Event with ID: ${eventId} not found`)
+
+    }
+});
