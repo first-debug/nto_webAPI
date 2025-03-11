@@ -42,3 +42,39 @@ button:hover {
     min-height: 256px;
     padding: 20px;
 }
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    font-family: 'Arial', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    color: #2c3e50;
+    text-decoration: none;
+    border-radius: 30px;
+    background: linear-gradient(145deg, #ffffff, #f0f0f0);
+    box-shadow: 3px 3px 6px #d1d1d1,
+    -3px -3px 6px #ffffff;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+.back-link::before {
+    content: '←';
+    transition: transform 0.3s ease;
+}
+.back-link:hover {
+    color: #3498db;
+    gap: 12px;
+    box-shadow: 2px 2px 4px #d1d1d1,
+    -2px -2px 4px #ffffff;
+}
+.back-link:hover::before {
+    transform: translateX(-4px);
+}
+.back-link:active {
+    transform: scale(0.96);
+    box-shadow: inset 2px 2px 4px #d1d1d1,
+    inset -2px -2px 4px #ffffff;
+}

@@ -14,14 +14,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-
-// TODO Обернуть все методы в try-catch
-// TODO Реализовать переход на главную страницу после успешного бронирования
 
 //@CrossOrigin
 @Log4j2
@@ -86,7 +81,7 @@ public class EventsController {
                             new Seats(
                                     rs.getInt("id"),
                                     rs.getInt("spaceId"),
-                                    parseSeats(rs.getString("seats"))),
+                                    SeatService.parseSeats(rs.getString("seats"))),
                     eventId);
             return seats != null ?
                     new ResponseEntity<>(seats,
@@ -102,7 +97,7 @@ public class EventsController {
         try {
             String response = jdbcTemplate.queryForObject("SELECT seats FROM events WHERE id = ?", String.class, request.eventId());
             if (response == null) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            short[][] dbSeats = parseSeats(response);
+            short[][] dbSeats = SeatService.parseSeats(response);
             short[][] requestSeats = request.seats();
             occupiedSeats.delete(0, occupiedSeats.length());
             for (short[] requestSeat : requestSeats)
@@ -118,36 +113,15 @@ public class EventsController {
                     PreparedStatement preparedStatement = con.prepareStatement("INSERT INTO orders VALUES (?, ?, ?)");
                     preparedStatement.setLong(1, orderId);
                     preparedStatement.setInt(2, request.eventId());
-                    preparedStatement.setString(3, " ");
+                    preparedStatement.setString(3, SeatService.parseRequestSeats(requestSeats));
                     return preparedStatement;
             };
+            log.info("{}", Arrays.deepToString(requestSeats));
             jdbcTemplate.execute(preparedStatementCreator, PreparedStatement::execute);
             jdbcTemplate.update("UPDATE events SET seats=? WHERE id=?", SeatService.getSeatsString(dbSeats), request.eventId());
             return new ResponseEntity<>(new OrderId(orderId), HttpStatus.OK);
-//            return new ResponseEntity<>(new Message("Места забронированы"), HttpStatus.OK);
         } catch (EmptyResultDataAccessException e) {
             return new ResponseEntity<>(new Message(e.getMessage()), HttpStatus.NOT_FOUND);
         }
-    }
-
-
-    private static short[][] parseSeats(String seats) {
-        String[] rows = seats.split(" ");
-        char[] nums = seats.toCharArray();
-        int maxRowLen = 0;
-        for (String row : rows)
-            if (row.length()> maxRowLen)
-                maxRowLen = row.length();
-        short[][] result = new short[rows.length][maxRowLen];
-        for (int i = 0, j = 0, k = 0; i < nums.length; i++) {
-            short num = (short)(nums[i] - 48);
-            if (num == -16) {
-                j++;
-                k = 0;
-            } else {
-                result[j][k++] = num;
-            }
-        }
-        return result;
     }
 }

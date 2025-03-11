@@ -6,12 +6,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
     if (eventId) {
-        const eventRes = await fetch(`http://localhost:8080/api/events/${eventId}`);
+        const eventRes = await fetch(`http://192.168.0.175:8080/api/events/${eventId}`);
         const event = await eventRes.json();
         document.getElementById("event-title").innerText = event.title;
         document.getElementById("event-date").innerText = event.startTime;
 
-        const seatsRes = await fetch(`http://localhost:8080/api/events/${event.id}/seats`);
+        const seatsRes = await fetch(`http://192.168.0.175:8080/api/events/${event.id}/seats`);
         const seatsJson = await seatsRes.json();
         seats = seatsJson.seats;
 
@@ -22,18 +22,20 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         seatsGrid.style.gridTemplateColumns = `repeat(${cols}, 30px)`;
 
-        for (let i = 0; i < rows; i++) {
-            for (let j = 0; j < cols; j++) {
+        for (let i = 0, count = 0, row = 1; i < rows; i++) {
+            for (let j = 0, col = 1; j < cols; j++) {
                 const seat = document.createElement('div');
                 seat.dataset.row = i;
                 seat.dataset.col = j;
+                seat.dataset.number = count++;
                 seat.className = 'seat';
                 if (seats[i][j] === 1) {
+                    seat.innerHTML = `<div class="tooltip">Ряд ${row} Место ${col}</div>`
                     seat.onclick = async () => {
                         if (seats[seat.dataset.row][seat.dataset.col] === 1) {
                             seats[seat.dataset.row][seat.dataset.col] = 2;
                             seat.className = seat.className.replace("exist", "selected");
-                            selectedSeats.push(Array(seat.dataset.row, seat.dataset.col));
+                            selectedSeats.push(Array(seat.dataset.row, seat.dataset.col, seat.dataset.number));
                         } else {
                             seats[seat.dataset.row][seat.dataset.col] = 1;
                             seat.className = seat.className.replace("selected", "exist");
@@ -41,11 +43,18 @@ document.addEventListener("DOMContentLoaded", async () => {
                                 i[0] !== seat.dataset.row || i[1] !== seat.dataset.col);
                         }
                     }
+                    col++;
                     seat.className += " exist";
-                } else if (seats[i][j] === 2)
+                } else if (seats[i][j] === 2) {
                     seat.className += " occupied";
+                    col++;
+                } else if (seats[i][j] === 3) {
+                    seat.className += " come";
+                    col++;
+                }
                 seatsGrid.appendChild(seat);
             }
+            row++;
         }
 
         const footer = document.getElementById("footer");
@@ -54,7 +63,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         button.className = "book-button";
         button.addEventListener("click", async () => {
             try {
-                const res = await fetch(`http://localhost:8080/api/events/book`, {
+                const res = await fetch(`http://192.168.0.175:8080/api/events/book`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ eventId, seats: selectedSeats })

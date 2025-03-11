@@ -7,12 +7,16 @@
     <link rel="stylesheet" href="../order/order.css">
 </head>
 <body>
-    <h1>Вы успешно забронировали места!</h1>
-    <h2 id="event-title"></h2>
+    <h1 id="message"></h1>
+    <h1 id="event-title"></h1>
+    <h3>Сохраните ссылку или сделайте скриншот qr-кода, чтобы не потерять!</h3>
     <div id="qrcode-container">
         <div id="qrcode"></div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="../order/order.js" defer></script>
+    <div class="footer" id="footer">
+        <a href="../../home" class="back-link">На главную</a>
+    </div>
 </body>
 </html>

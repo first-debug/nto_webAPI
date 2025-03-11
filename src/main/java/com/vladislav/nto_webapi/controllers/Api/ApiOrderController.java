@@ -2,16 +2,23 @@ package com.vladislav.nto_webapi.controllers.Api;
 
 import com.vladislav.nto_webapi.Schemes.Requests.OrderInfo;
 import com.vladislav.nto_webapi.Schemes.Response.Message;
+import com.vladislav.nto_webapi.Services.SeatService;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.sql.PreparedStatement;
 
 @Log4j2
 @RestController
@@ -23,7 +30,6 @@ public class ApiOrderController {
 
     @GetMapping("/{orderId}")
     public ResponseEntity<?> getOrder(@PathVariable long orderId) {
-        log.info("orderId: {}", orderId);
         try {
             OrderInfo orderInfo = jdbcTemplate.queryForObject(
                     "SELECT e.title, o.id FROM events as e, orders as o WHERE e.id=o.eventid AND o.id=?",
@@ -40,10 +46,47 @@ public class ApiOrderController {
     @GetMapping("/check/{orderId}")
     public ResponseEntity<?> check(@PathVariable("orderId") String orderId) {
         try {
-            jdbcTemplate.queryForObject("SELECT id FROM orders WHERE id = ?", Integer.class, orderId);
-        } catch (EmptyResultDataAccessException ex) {
+            Order order = new Order();
+            jdbcTemplate.query("SELECT eventId, seats FROM orders WHERE id = ?", resultSet -> {
+                order.setEventId(resultSet.getInt("eventId"));
+                order.setSeats(SeatService.parseOrderSeats(resultSet.getString("seats")));
+            }, orderId);
+            short[][] eventSeats = SeatService.parseSeats(
+                    jdbcTemplate.queryForObject("SELECT seats FROM events WHERE id=?",
+                    String.class,
+                    order.eventId)
+            );
+            if (eventSeats == null)
+                throw new Exception("Field 'seats' is empty!");
+            for (short seatNum : order.seats) {
+                int row = seatNum / eventSeats[0].length, col = seatNum / eventSeats.length;
+                if (eventSeats[row][col] == 3)
+                    throw new Exception("This order already has been checked!");
+                eventSeats[row][col] = 3;
+            }
+
+            PreparedStatementCreator creator = (connection) -> {
+                PreparedStatement statement = connection.prepareStatement("UPDATE events SET seats=? WHERE id=?");
+                statement.setString(1, SeatService.getSeatsString(eventSeats));
+                statement.setInt(2, order.eventId);
+                return statement;
+            };
+            jdbcTemplate.execute(creator, PreparedStatement::execute);
+
+        } catch (Exception ex) {
+            log.warn(ex);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    private static class Order
+    {
+        Integer eventId;
+        short[] seats;
+    }
+
 }

@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded",  async () => {
     try {
-        const res = await fetch('http://localhost:8080/api/events');
+        const res = await fetch('http://192.168.0.175:8080/api/events');
         const events = await res.json();
         const list = document.getElementById('events-list');
         list.innerHTML = '';
