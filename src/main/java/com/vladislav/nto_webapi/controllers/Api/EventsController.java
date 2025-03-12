@@ -5,8 +5,8 @@ import com.vladislav.nto_webapi.Schemes.Response.Message;
 import com.vladislav.nto_webapi.Schemes.Response.OrderId;
 import com.vladislav.nto_webapi.Schemes.Response.Seats;
 import com.vladislav.nto_webapi.Services.SeatService;
+import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,10 +22,11 @@ import java.util.*;
 @Log4j2
 @RestController
 @RequestMapping("/api/events")
+@AllArgsConstructor
 public class EventsController {
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
+    private final JdbcTemplate jdbcTemplate;
+    private final SeatService seatService;
 
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm dd.MM.yyyy");
     private final StringBuilder occupiedSeats = new StringBuilder();
@@ -81,7 +82,7 @@ public class EventsController {
                             new Seats(
                                     rs.getInt("id"),
                                     rs.getInt("spaceId"),
-                                    SeatService.parseSeats(rs.getString("seats"))),
+                                    seatService.parseSeats(rs.getString("seats"))),
                     eventId);
             return seats != null ?
                     new ResponseEntity<>(seats,
@@ -97,7 +98,7 @@ public class EventsController {
         try {
             String response = jdbcTemplate.queryForObject("SELECT seats FROM events WHERE id = ?", String.class, request.eventId());
             if (response == null) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            short[][] dbSeats = SeatService.parseSeats(response);
+            short[][] dbSeats = seatService.parseSeats(response);
             short[][] requestSeats = request.seats();
             occupiedSeats.delete(0, occupiedSeats.length());
             for (short[] requestSeat : requestSeats)
@@ -113,12 +114,11 @@ public class EventsController {
                     PreparedStatement preparedStatement = con.prepareStatement("INSERT INTO orders VALUES (?, ?, ?)");
                     preparedStatement.setLong(1, orderId);
                     preparedStatement.setInt(2, request.eventId());
-                    preparedStatement.setString(3, SeatService.parseRequestSeats(requestSeats));
+                    preparedStatement.setString(3, seatService.parseRequestSeats(requestSeats));
                     return preparedStatement;
             };
-            log.info("{}", Arrays.deepToString(requestSeats));
             jdbcTemplate.execute(preparedStatementCreator, PreparedStatement::execute);
-            jdbcTemplate.update("UPDATE events SET seats=? WHERE id=?", SeatService.getSeatsString(dbSeats), request.eventId());
+            jdbcTemplate.update("UPDATE events SET seats=? WHERE id=?", seatService.getSeatsString(dbSeats), request.eventId());
             return new ResponseEntity<>(new OrderId(orderId), HttpStatus.OK);
         } catch (EmptyResultDataAccessException e) {
             return new ResponseEntity<>(new Message(e.getMessage()), HttpStatus.NOT_FOUND);

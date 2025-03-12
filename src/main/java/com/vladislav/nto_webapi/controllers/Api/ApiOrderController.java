@@ -7,7 +7,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,10 +22,11 @@ import java.sql.PreparedStatement;
 @Log4j2
 @RestController
 @RequestMapping("/api/order")
+@AllArgsConstructor
 public class ApiOrderController {
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
+    private final JdbcTemplate jdbcTemplate;
+    private final SeatService seatService;
 
     @GetMapping("/{orderId}")
     public ResponseEntity<?> getOrder(@PathVariable long orderId) {
@@ -49,9 +49,9 @@ public class ApiOrderController {
             Order order = new Order();
             jdbcTemplate.query("SELECT eventId, seats FROM orders WHERE id = ?", resultSet -> {
                 order.setEventId(resultSet.getInt("eventId"));
-                order.setSeats(SeatService.parseOrderSeats(resultSet.getString("seats")));
+                order.setSeats(seatService.parseOrderSeats(resultSet.getString("seats")));
             }, orderId);
-            short[][] eventSeats = SeatService.parseSeats(
+            short[][] eventSeats = seatService.parseSeats(
                     jdbcTemplate.queryForObject("SELECT seats FROM events WHERE id=?",
                     String.class,
                     order.eventId)
@@ -59,7 +59,7 @@ public class ApiOrderController {
             if (eventSeats == null)
                 throw new Exception("Field 'seats' is empty!");
             for (short seatNum : order.seats) {
-                int row = seatNum / eventSeats[0].length, col = seatNum / eventSeats.length;
+                int row = seatNum / eventSeats[0].length, col = seatNum - row * eventSeats[0].length;
                 if (eventSeats[row][col] == 3)
                     throw new Exception("This order already has been checked!");
                 eventSeats[row][col] = 3;
@@ -67,7 +67,7 @@ public class ApiOrderController {
 
             PreparedStatementCreator creator = (connection) -> {
                 PreparedStatement statement = connection.prepareStatement("UPDATE events SET seats=? WHERE id=?");
-                statement.setString(1, SeatService.getSeatsString(eventSeats));
+                statement.setString(1, seatService.getSeatsString(eventSeats));
                 statement.setInt(2, order.eventId);
                 return statement;
             };
