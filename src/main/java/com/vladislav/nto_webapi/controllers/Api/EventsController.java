@@ -12,9 +12,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -34,17 +37,17 @@ public class EventsController {
     @GetMapping()
     public ResponseEntity<List<Event>> getEvents() {
         try {
-            List<Event> answer = new ArrayList<>();
-            jdbcTemplate.query("SELECT id, title, description, spaceId, timeToStart FROM events", resultSet -> {
-                for (int i = 1; i <= resultSet.getMetaData().getColumnCount(); i += 5) {
-                    answer.add(
-                            new Event(
-                                    resultSet.getInt(i),
-                                    resultSet.getString(i + 1),
-                                    resultSet.getString(i + 2),
-                                    resultSet.getInt(i + 3),
-                                    dateFormat.format(resultSet.getDate(i + 4)))
-                    );
+            List<Event> answer = jdbcTemplate.query("SELECT id, title, description, spaceId, timeToStart FROM events",
+             new RowMapper<Event>() {
+                @Override
+                public Event mapRow(ResultSet resultSet, int rowNum) throws SQLException {
+                    return new Event(
+                                    resultSet.getInt(1),
+                                    resultSet.getString(2),
+                                    resultSet.getString(3),
+                                    resultSet.getInt(4),
+                                    dateFormat.format(resultSet.getDate(5)));
+                    
                 }
             });
             return new ResponseEntity<>(answer, HttpStatus.OK);
@@ -97,10 +100,12 @@ public class EventsController {
     public ResponseEntity<?> bookSeats(@RequestBody com.vladislav.nto_webapi.Schemes.Requests.Seats request) {
         try {
             String response = jdbcTemplate.queryForObject("SELECT seats FROM events WHERE id = ?", String.class, request.eventId());
-            if (response == null) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            if (response == null)
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             short[][] dbSeats = seatService.parseSeats(response);
             short[][] requestSeats = request.seats();
             occupiedSeats.delete(0, occupiedSeats.length());
+
             for (short[] requestSeat : requestSeats)
                 if (dbSeats[requestSeat[0]][requestSeat[1]] == 2)
                     occupiedSeats.append('(').append(requestSeat[0]).append(", ").append(requestSeat[1]).append(')');

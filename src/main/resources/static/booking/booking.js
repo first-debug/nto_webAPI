@@ -6,12 +6,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
     if (eventId) {
-        const eventRes = await fetch(`http://192.168.0.175:8080/api/events/${eventId}`);
+        const eventRes = await fetch(`http://localhost:8080/api/events/${eventId}`);
         const event = await eventRes.json();
         document.getElementById("event-title").innerText = event.title;
         document.getElementById("event-date").innerText = event.startTime;
 
-        const seatsRes = await fetch(`http://192.168.0.175:8080/api/events/${event.id}/seats`);
+        const seatsRes = await fetch(`http://localhost:8080/api/events/${event.id}/seats`);
         const seatsJson = await seatsRes.json();
         seats = seatsJson.seats;
 
@@ -63,7 +63,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         button.className = "book-button";
         button.addEventListener("click", async () => {
             try {
-                const res = await fetch(`http://192.168.0.175:8080/api/events/book`, {
+                const res = await fetch(`http://localhost:8080/api/events/book`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ eventId, seats: selectedSeats })

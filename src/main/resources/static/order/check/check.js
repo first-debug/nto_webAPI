@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (orderId == null)
         console.error("Нет параметра orderId");
 
-    const res = await fetch(`http://192.168.0.175:8080/api/order/check/${orderId}`);
+    const res = await fetch(`http://localhost:8080/api/order/check/${orderId}`);
     if (res.ok) {
         document.getElementById("status-title").innerText = "Успешно!";
         document.getElementById("status-card").className = "success";
