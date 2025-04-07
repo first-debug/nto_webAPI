@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("api/ping")
-public class PingController {
+public class ApiPingController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public void ping() {

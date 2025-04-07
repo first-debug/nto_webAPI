@@ -26,7 +26,7 @@ import java.util.*;
 @RestController
 @RequestMapping("/api/events")
 @AllArgsConstructor
-public class EventsController {
+public class ApiEventsController {
 
     private final JdbcTemplate jdbcTemplate;
     private final SeatService seatService;

@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>О нас</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        line-height: 1.6;
+      }
+
+      h1,
+      h2 {
+        color: #333;
+      }
+
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        margin: 20px 0;
+      }
+
+      th,
+      td {
+        border: 1px solid #ddd;
+        padding: 10px;
+        text-align: left;
+      }
+
+      th {
+        background-color: #f5f5f5;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>О проекте</h1>
+
+    <h2>Основные этапы создания пректа:</h2>
+    <ol>
+      <li>Анализ требований</li>
+      <li>Проектирвание интерфейса</li>
+      <li>Разработка функционала</li>
+      <li>Тестирование и запуск</li>
+    </ol>
+
+    <h2>Использованные технологии:</h2>
+    <ul>
+      <li>HTML5</li>
+      <li>CSS3 для стилизации</li>
+      <li>JavaScript для интерактивности</li>
+    </ul>
+    <h2>Ключевые понятия:</h2>
+    <dl>
+      <dt>Frontend</dt>
+      <dd>Часть сайта, которую видет пользователь</dd>
+      <dt>Backend</dt>
+      <dd>Серверная часть сайта</dd>
+    </dl>
+    <h2>Информация о проекте:</h2>
+    <table>
+      <tr>
+        <th>Параметры</th>
+        <th>Значение</th>
+      </tr>
+      <tr>
+        <td style="font-weight: blob">Название</td>
+        <td>Веб-сервис для покупки белетов</td>
+      </tr>
+      <tr>
+        <td>Создатель</td>
+        <td>Васильев Владислав</td>
+      </tr>
+      <tr>
+        <td>Ресурсы</td>
+        <td>
+          <table>
+            <tr>
+              <td>Документация</td>
+              <td>
+                <a href="https://github.com/first-debug/nto-webAPI/Readme.md">
+                  Readme.md
+                </a>
+              </td>
+            </tr>
+            <tr>
+              <td>Иконка</td>
+              <td>
+                <img
+                  src="https://cdn-icons-png.flaticon.com/512/4942/4942902.png"
+                  alt="Иконка проекта"
+                />
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+    <script>
+      let visitorFeedback = promt("Что вы думаете об этом проеке?", "-1");
+      if (visitorFeedback && visitorFeedback !== "-1") {
+        alert(`Спасибо за ваш отзыв: ${visitorFeedback}!`);
+      } else {
+        alert("Спасибо, что посетили наш сайт!");
+      }
+    </script>
+  </body>
+</html>
