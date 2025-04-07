@@ -10,6 +10,6 @@ class AboutController {
 
   @GetMapping
   public String about() {
-    return "laba.html";
+    return "about.html";
   } 
 }
