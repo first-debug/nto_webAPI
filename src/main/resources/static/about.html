@@ -5,12 +5,66 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>О нас</title>
     <style>
-      body {
+      #main {
         font-family: Arial, sans-serif;
         max-width: 800px;
         margin: 0 auto;
         padding: 20px;
         line-height: 1.6;
+      }
+
+      .header-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 1rem 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .site-header {
+        font-family: Arial, sans-serif;
+        background-color: #ffffff;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+      }
+
+      .logo {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #2c3e50;
+        text-decoration: none;
+      }
+
+      .nav-list {
+        display: flex;
+        gap: 2rem;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+
+      .nav-list li {
+        padding: 10px;
+        /*border: 1px solid #ccc;*/
+        border: 0;
+        margin-bottom: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .nav-link {
+        color: #2c3e50;
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.3s;
+      }
+
+      .nav-link:hover {
+        color: #3498db;
       }
 
       h1,
@@ -35,74 +89,87 @@
         background-color: #f5f5f5;
       }
     </style>
+    <link rel="icon" href="favicon.png" type="image/x-icon">
   </head>
+  <header class="site-header">
+    <div class="header-container">
+      <a class="logo">Бронирование мест</a>
 
+      <nav class="main-nav">
+        <ul class="nav-list">
+          <li><a href="home" id="toMainButton" class="nav-link" style="cursor: pointer">Главная</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
   <body>
-    <h1>О проекте</h1>
+    <div id="main">
+      <h1>О проекте</h1>
 
-    <h2>Основные этапы создания пректа:</h2>
-    <ol>
-      <li>Анализ требований</li>
-      <li>Проектирвание интерфейса</li>
-      <li>Разработка функционала</li>
-      <li>Тестирование и запуск</li>
-    </ol>
+      <h2>Основные этапы создания проекта:</h2>
+      <ol>
+        <li>Анализ требований</li>
+        <li>Проектирование интерфейса</li>
+        <li>Разработка функционала</li>
+        <li>Тестирование и запуск</li>
+      </ol>
 
-    <h2>Использованные технологии:</h2>
-    <ul>
-      <li>HTML5</li>
-      <li>CSS3 для стилизации</li>
-      <li>JavaScript для интерактивности</li>
-    </ul>
-    <h2>Ключевые понятия:</h2>
-    <dl>
-      <dt>Frontend</dt>
-      <dd>Часть сайта, которую видет пользователь</dd>
-      <dt>Backend</dt>
-      <dd>Серверная часть сайта</dd>
-    </dl>
-    <h2>Информация о проекте:</h2>
-    <table>
-      <tr>
-        <th>Параметры</th>
-        <th>Значение</th>
-      </tr>
-      <tr>
-        <td style="font-weight: blob">Название</td>
-        <td>Веб-сервис для покупки белетов</td>
-      </tr>
-      <tr>
-        <td>Создатель</td>
-        <td>Васильев Владислав</td>
-      </tr>
-      <tr>
-        <td>Ресурсы</td>
-        <td>
-          <table>
-            <tr>
-              <td>Документация</td>
-              <td>
-                <a href="https://github.com/first-debug/nto-webAPI/Readme.md">
-                  Readme.md
-                </a>
-              </td>
-            </tr>
-            <tr>
-              <td>Иконка</td>
-              <td>
-                <img
-                  src="https://cdn-icons-png.flaticon.com/512/4942/4942902.png"
-                  alt="Иконка проекта"
-                />
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-    </table>
+      <h2>Использованные технологии:</h2>
+      <ul>
+        <li>HTML5</li>
+        <li>CSS3 для стилизации</li>
+        <li>JavaScript для интерактивности</li>
+      </ul>
+      <h2>Ключевые понятия:</h2>
+      <dl>
+        <dt>Frontend</dt>
+        <dd>Часть сайта, которую видит пользователь</dd>
+        <dt>Backend</dt>
+        <dd>Серверная часть сайта</dd>
+      </dl>
+      <h2>Информация о проекте:</h2>
+      <table>
+        <tr>
+          <th>Параметры</th>
+          <th>Значение</th>
+        </tr>
+        <tr>
+          <td style="font-weight: bold">Название</td>
+          <td>Веб-сервис для покупки билетов</td>
+        </tr>
+        <tr>
+          <td>Создатель</td>
+          <td>Васильев Владислав</td>
+        </tr>
+        <tr>
+          <td>Ресурсы</td>
+          <td>
+            <table>
+              <tr>
+                <td>Документация</td>
+                <td>
+                  <a href="https://github.com/first-debug/nto-webAPI/Readme.md" target="_blank">
+                    Readme.md
+                  </a>
+                </td>
+              </tr>
+              <tr>
+                <td>Иконка</td>
+                <td>
+                  <img
+                    src="favicon.png"
+                    alt="Иконка проекта"
+                  />
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </div>
     <script>
-      let visitorFeedback = promt("Что вы думаете об этом проеке?", "-1");
-      if (visitorFeedback && visitorFeedback !== "-1") {
+      let visitorFeedback = prompt("Что вы думаете об этом проекте?");
+      if (visitorFeedback && visitorFeedback !== "") {
         alert(`Спасибо за ваш отзыв: ${visitorFeedback}!`);
       } else {
         alert("Спасибо, что посетили наш сайт!");
