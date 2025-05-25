@@ -3,7 +3,8 @@ spring:
     name: nto_webAPI
   datasource:
     driver-class-name: org.sqlite.JDBC
-    url: 'jdbc:sqlite:D:\Projects\java\nto\src\main\resources\com\vladislav\infrastructure\db.db'
+    url: 'jdbc:sqlite:src\main\resources\db.db'
 logging:
   level:
     web: error
+    

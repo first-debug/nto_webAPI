@@ -88,5 +88,4 @@ public class ApiOrderController {
         Integer eventId;
         short[] seats;
     }
-
 }

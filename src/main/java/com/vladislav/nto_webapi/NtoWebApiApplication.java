@@ -19,7 +19,7 @@ public class NtoWebApiApplication {
     public DataSourceInitializer dataSourceInitializer(@Autowired DataSource dataSource) {
         DataSourceInitializer initializer = new DataSourceInitializer();
         initializer.setDataSource(dataSource);
-
+        
         return initializer;
     }
 }
